@@ -21,8 +21,11 @@ const test = async () => {
     //let getSKU = await utility.getEverySku();
     //console.log(getSKU)
     
-    let getData = await utility.getDataByEntryCode("27773-02");
-    console.log(getData)
+    //let getData = await utility.getDataByEntryCode("27773-02");
+    //console.log(getData)
+
+    utility.sortAndStructureData("27773-02");
+
 }
 
 test();
