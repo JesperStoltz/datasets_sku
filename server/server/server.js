@@ -25,7 +25,7 @@ const test = async () => {
     //console.log(getData)
 
     utility.sortAndStructureData("27773-02");
-
+    
 }
 
 test();
