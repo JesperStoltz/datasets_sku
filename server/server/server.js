@@ -21,7 +21,7 @@ const test = async () => {
     //console.log(getData)
 
     let structuredData = await utility.sortAndStructureData("27773-02");
-    console.log(structuredData)
+   // console.log(structuredData)
 }
 test();
 
