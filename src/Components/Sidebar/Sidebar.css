@@ -1,0 +1,14 @@
+#Sidebar {
+    border: 1px solid blue;
+    height: 100vh;
+    max-width: max-content;
+    padding: 5px;
+    overflow: auto; 
+    float: left;
+}
+
+#Sidebar p {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}

@@ -1,0 +1,31 @@
+#Table table {
+    border: 1px solid black;
+    min-width: -webkit-fill-available;
+    border-collapse: collapse;
+}
+
+#Table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
+
+#Table td, #Table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+#Table tr:nth-child(even){background-color: #f2f2f2;}
+
+#Table tr:hover {background-color: #ddd;}
+
+#Table table thead {
+    font-weight: bold;
+    color: red;
+}
+
+#Table table th, td {
+    border: 1px solid black;
+}
