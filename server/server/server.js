@@ -13,10 +13,6 @@ server.use(function (req, res, next) {
     next();
 });
 
-//utility.getEverySku();
-
-//utility.getDataByEntryCode();
-
 const test = async () => {
     //let getSKU = await utility.getEverySku();
     //console.log(getSKU)
@@ -24,11 +20,20 @@ const test = async () => {
     //let getData = await utility.getDataByEntryCode("27773-02");
     //console.log(getData)
 
-    utility.sortAndStructureData("27773-02");
-    
+    let structuredData = await utility.sortAndStructureData("27773-02");
+    console.log(structuredData)
 }
-
 test();
+
+server.get('/getskus', async (req, res) => {
+    const skus = await utility.getEverySku();
+    res.status('200').send(skus);
+});
+
+server.get('/getdata/:id', async (req, res) => {
+    const skuData = await utility.sortAndStructureData(req.params.id);
+    res.status('200').send(skuData);
+});
 
 server.listen(port, () =>
     console.log(`Server listening on port ${port}!`)
