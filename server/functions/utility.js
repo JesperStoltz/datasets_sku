@@ -38,10 +38,9 @@ module.exports = setup = {
     optimizeData: async (entryCode) => {
 
         let data = await module.exports.getDataByEntryCode(entryCode);
-        let marketIdObject = {};
-
-        return new Promise((resolve, reject) => {
-
+        
+        return await new Promise((resolve, reject) => {
+            let marketIdObject = {};
             //Sorting on MarketId. Might be superfluous later.
             let validDateSortedData = data.sort((former, current) => {
                 if (former.ValidFrom < current.ValidFrom) {
@@ -81,15 +80,19 @@ module.exports = setup = {
             for (let market in marketIdObject) {
 
                 for (let currency in marketIdObject[market]) {
+
                     if (market !== "sv") { continue; }
+
                     const runLoop = async () => {
                         let data = await module.exports.loopAndOrganizeData(marketIdObject[market][currency]);
                         let noDatesCollided = await module.exports.noDatesCollide(data);
-                        //console.log(noDatesCollided)
-                        //console.log(currency)
+                        console.log(noDatesCollided)
+                        console.log(marketIdObject[market][currency])
+
                         if (!noDatesCollided) {
                             runLoop();
                         }
+
                     }
                     runLoop();
 
@@ -104,13 +107,12 @@ module.exports = setup = {
     noDatesCollide: async (currencyArray) => {
 
         return new Promise((resolve, reject) => {
+            let noCollidingDates = false;
 
             for (let i = 1; i < currencyArray.length; i++) {
-
-
+                //console.log(i)
                 let compareItem = currencyArray[i - 1];
                 let marketItem = currencyArray[i];
-
                 const validFromMarket = marketItem.ValidFrom ? moment(marketItem.ValidFrom).format() : moment(new Date).format();
                 const validUntilMarket = marketItem.ValidUntil ? moment(marketItem.ValidUntil).format() : moment(new Date).format();
                 const validFromCompare = compareItem.ValidFrom ? moment(compareItem.ValidFrom).format() : moment(new Date).format();
@@ -118,45 +120,97 @@ module.exports = setup = {
 
                 if (moment(validFromCompare).isSame(moment(validFromMarket)) && moment(validUntilCompare).isSame(moment(validUntilMarket))) {
                     //Exact same dates
-                    resolve(false);
+                    console.log("Exact same dates")
+                    noCollidingDates = false;
+                    break;
                 }
                 else if (moment(validFromMarket).isBetween(moment(validFromCompare).subtract(1, "day"), moment(validUntilCompare).add(1, "day")) &&
                     moment(validUntilMarket).isBetween(moment(validFromCompare).subtract(1, "day"), moment(validUntilCompare).add(1, "day"))) {
                     //[i] is between the dates of [i-1]
-                    resolve(false);
+                    console.log("[i] is between the dates of [i-1]")
+                    noCollidingDates = false;
+                    break;
                 }
                 else if (moment(validFromCompare).isBetween(moment(validFromMarket).subtract(1, "day"), moment(validUntilMarket).add(1, "day")) &&
                     moment(validUntilCompare).isBetween(moment(validFromMarket).subtract(1, "day"), moment(validUntilMarket).add(1, "day"))) {
                     //[i-1] is between the dates of [i]
-                    resolve(false);
+                    console.log("[i-1] is between the dates of [i]")
+
+                    noCollidingDates = false;
+                    break;
                 }
                 else if (moment(validFromMarket).isBefore(moment(validFromCompare)) && //Börja fixa här
                     moment(validUntilMarket).isBetween(moment(validFromCompare).subtract(1, "day"), moment(validUntilCompare).add(1, "day"))) {
                     //[i] starts before [i-1] and ends between the dates of [i-1]
-                    resolve(false);
+                    console.log("[i] starts before [i-1] and ends between the dates of [i-1]")
+                    if (moment(validUntilCompare).format("YYYY-MM-DD") === moment(validFromMarket).format("YYYY-MM-DD")){
+                        
+                        noCollidingDates = true;
+                        continue;
+
+                    }
+                    else {
+
+                        noCollidingDates = false;
+                        break;
+
+                    }
                 }
                 else if (moment(validUntilMarket).isAfter(moment(validUntilCompare)) &&
                     moment(validFromMarket).isBetween(moment(validFromCompare).subtract(1, "day"), moment(validUntilCompare).add(1, "day"))) {
                     //[i] ends after [i-1] and starts between the dates of [i-1]
-                    resolve(false);
+                    console.log("[i] ends after [i-1] and starts between the dates of [i-1]")
+                    if (moment(validUntilCompare).format("YYYY-MM-DD") === moment(validFromMarket).format("YYYY-MM-DD")){
+
+                        noCollidingDates = true;
+                        continue;
+
+                    }
+                    else {
+
+                        noCollidingDates = false;
+                        break;
+
+                    }
                 }
                 else if (moment(validFromCompare).isBefore(moment(validFromMarket)) &&
                     moment(validUntilCompare).isBetween(moment(validFromMarket).subtract(1, "day"), moment(validUntilMarket).add(1, "day"))) {
                     //[i-1] starts before [i] and ends between the dates of [i]
-                    resolve(false);
+                    console.log("[i-1] starts before [i] and ends between the dates of [i]")
+                    if (moment(validUntilCompare).format("YYYY-MM-DD") === moment(validFromMarket).format("YYYY-MM-DD")){
+
+                        noCollidingDates = true;
+
+                    }
+                    else {
+
+                        noCollidingDates = false;
+                        break;
+
+                    }
                 }
                 else if (moment(validUntilCompare).isAfter(moment(validUntilMarket)) &&
                     moment(validFromCompare).isBetween(moment(validFromMarket).subtract(1, "day"), moment(validUntilMarket).add(1, "day"))) {
                     //[i-1] ends after [i] and starts between the dates of [i]
-                    resolve(false);
+                    console.log("[i-1] ends after [i] and starts between the dates of [i]")
+                    if (moment(validUntilCompare).format("YYYY-MM-DD") === moment(validFromMarket).format("YYYY-MM-DD")){
+
+                        noCollidingDates = true;
+
+                    }
+                    else {
+
+                        noCollidingDates = false;
+                        break;
+
+                    }
                 }
                 else {
-                    resolve(true);
+                    noCollidingDates = true;
                 }
-
             }
-
-        });
+            resolve (noCollidingDates)
+        }); //End of Promise?
 
     }, //End of noDatesCollide
 
@@ -165,15 +219,6 @@ module.exports = setup = {
         return new Promise((resolve, reject) => {
 
             for (let i = 1; i < array.length; i++) {
-
-                 if (i === 1) {
-                    console.log("===========1===========")
-                    console.log(array);
-                }
-                if (i === 2) {
-                    console.log("===========2===========")
-                    console.log(array)
-                } 
 
                 let compareItem = array[i - 1];
                 let marketItem = array[i];
@@ -210,9 +255,8 @@ module.exports = setup = {
                     else if (marketItem.UnitPrice < compareItem.UnitPrice) { //if [i] has a lower price than [i-j]
 
                         let continueItem = { ...compareItem, ValidFrom: marketItem.ValidUntil }; //Break [i-1] into two items and set the second one end where [i] ends
-                        compareItem = {...compareItem, ValidUntil: marketItem.ValidFrom }
-
-                        array.splice(i-1, 1, compareItem)
+                        compareItem = { ...compareItem, ValidUntil: marketItem.ValidFrom }
+                        array.splice(i - 1, 1, compareItem)
 
                         if (continueItem.ValidFrom !== continueItem.ValidUntil) { //If the second item doesn't start and end on the same day (=== conflicting with [i])
                             array.splice(i + 1, 0, continueItem); //then put the second item after the [i]
@@ -342,8 +386,8 @@ module.exports = setup = {
                     }
 
                 } //End of If compareItems ValidUntil is after compareItems, AND has a ValidFrom between compareItems dates
-
             } //End of for (let i=0; i < marketIdObject[market][currency].length; i)
+            console.log(array)
             resolve(array);
         }); //End of Promise
 
