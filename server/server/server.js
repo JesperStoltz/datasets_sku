@@ -20,8 +20,9 @@ const test = async () => {
     //let getData = await utility.getDataByEntryCode("27773-02");
     //console.log(getData)
 
-    let structuredData = await utility.sortAndStructureData("27773-02");
-   // console.log(structuredData)
+    //let structuredData = await utility.sortAndStructureData("27773-02");
+    let structuredData = await utility.optimizeData("27773-02");
+    //console.log(structuredData)
 }
 test();
 
@@ -31,7 +32,8 @@ server.get('/getskus', async (req, res) => {
 });
 
 server.get('/getdata/:id', async (req, res) => {
-    const skuData = await utility.sortAndStructureData(req.params.id);
+    //const skuData = await utility.sortAndStructureData(req.params.id);
+    const skuData = await utility.optimizeData(req.params.id)
     res.status('200').send(skuData);
 });
 

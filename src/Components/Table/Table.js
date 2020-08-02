@@ -4,9 +4,6 @@ const moment = require('moment');
 
 const Table = (props) => {
 
-  //skuData={SkuData}
-  console.log(props.skuData)
-
    let skuData = props.skuData.map(data => {
 
     let validFrom = data.ValidFrom ? moment(data.ValidFrom).format("YYYY-MM-DD HH:mm:ss") : null;
